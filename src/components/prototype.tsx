@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRoute } from "@/lib/demo-store";
+import { customerAppLinks } from "@/lib/customer-app";
 import { services, type ServiceKey } from "@/lib/demo";
 import { Explore } from "./explore";
 import { EasementIncome } from "./income";
@@ -152,6 +153,14 @@ export function Prototype() {
             );
           })}
         </nav>
+        <div className="header-account-actions" aria-label="Customer account">
+          <a className="button secondary" href={customerAppLinks.login}>
+            Log In
+          </a>
+          <a className="button" href={customerAppLinks.signup}>
+            Create Free Account
+          </a>
+        </div>
       </header>
       <div className="concept-banner">
         INTERACTIVE CONCEPT{" "}

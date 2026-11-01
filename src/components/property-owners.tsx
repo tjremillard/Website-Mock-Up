@@ -16,15 +16,6 @@ export function PropertyOwners() {
         Explore your portfolio’s potential, then choose the marketing service
         that fits.
       </Heading>
-      <div className="owner-services-toolbar">
-        <LinkButton
-          to={state.ownerSignedIn ? "owner/analyses" : "account/owner"}
-          secondary
-        >
-          {state.ownerSignedIn ? "Saved analyses" : "Create a Free Account"}
-        </LinkButton>
-        <a href="#owner/workspace">Owner workspace</a>
-      </div>
       {state.ownerSignedIn && state.ownerPlan && (
         <p className="notice" role="status">
           Your service selection is saved for this prototype. No subscription

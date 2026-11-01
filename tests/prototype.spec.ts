@@ -232,7 +232,7 @@ test("developer property gate, free account, and pending inquiry", async ({
   await page
     .getByRole("button", { name: "Request introduction · demo" })
     .click();
-  await page.getByRole("link", { name: "Pending Offers" }).click();
+  await page.goto("/#developer/pending");
   await expect(
     page.getByText("We are exploring rooftop infrastructure."),
   ).toBeVisible();
@@ -256,9 +256,15 @@ test("developer login returns to chosen property and direct links stay gated", a
   await expect(page.locator(".property-detail")).toContainText(
     "16 Technology Drive",
   );
-  await page
-    .getByRole("button", { name: "Log out of demo", exact: true })
-    .click();
+  await page.evaluate(() => {
+    const key = "easement-prototype-v1";
+    const state = JSON.parse(localStorage.getItem(key) ?? "{}");
+    localStorage.setItem(
+      key,
+      JSON.stringify({ ...state, developerSignedIn: false }),
+    );
+  });
+  await page.goto("/#developer/battery");
   await page
     .getByRole("button", { name: "View 210 River Street on map", exact: true })
     .click();
@@ -657,4 +663,97 @@ test("legacy catalog restrictions no longer limit developer listings", async ({
   await page.goto("/#developer");
   await expect(page.locator(".property-card")).toHaveCount(5);
   await expect(page.locator(".developer-access, .criteria")).toHaveCount(0);
+});
+
+test("marketing tabs share separate app account buttons and streamlined content", async ({
+  page,
+}) => {
+  for (const route of ["explore", "income", "owner/overview", "developer"]) {
+    await page.goto(`/#${route}`);
+    const header = page.locator(".site-header");
+    const login = header.getByRole("link", { name: "Log In", exact: true });
+    const signup = header.getByRole("link", {
+      name: "Create Free Account",
+      exact: true,
+    });
+    await expect(login).toBeVisible();
+    await expect(signup).toBeVisible();
+    await expect(login).toHaveAttribute(
+      "href",
+      "https://app.easementexchange.com/login",
+    );
+    await expect(signup).toHaveAttribute(
+      "href",
+      "https://app.easementexchange.com/signup",
+    );
+    const actions = await header
+      .locator(".header-account-actions")
+      .boundingBox();
+    const bounds = await header.boundingBox();
+    expect(actions!.x + actions!.width).toBeGreaterThan(
+      bounds!.x + bounds!.width - 40,
+    );
+  }
+  await page.goto("/#owner/overview");
+  await expect(
+    page
+      .locator("main")
+      .getByRole("link", { name: "Create a Free Account", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page
+      .locator("main")
+      .getByRole("link", { name: "Owner workspace", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.locator(".owner-plan-grid .card")).toHaveCount(4);
+  await page.goto("/#developer");
+  await expect(
+    page.getByRole("navigation", { name: "Developer workspace" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Featured Properties", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Pending Offers", exact: false }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText(
+      "Free for infrastructure developers. Log in or create a free account to browse property details.",
+      { exact: true },
+    ),
+  ).toHaveCount(0);
+  await expect(
+    page.locator(".developer-type-control a, .developer-type-control button"),
+  ).toHaveCount(0);
+  await expect(page.locator(".developer-map-section")).toBeVisible();
+  await expect(page.locator(".property-card")).toHaveCount(5);
+  await page.screenshot({
+    path: "test-results/marketing-developer-desktop.png",
+    fullPage: true,
+  });
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const route of ["explore", "income", "owner/overview", "developer"]) {
+      await page.goto(`/#${route}`);
+      await expect(
+        page
+          .locator(".header-account-actions")
+          .getByRole("link", { name: "Log In", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page
+          .locator(".header-account-actions")
+          .getByRole("link", { name: "Create Free Account", exact: true }),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBeTruthy();
+    }
+  }
+  await page.screenshot({
+    path: "test-results/marketing-header-mobile.png",
+    fullPage: true,
+  });
 });

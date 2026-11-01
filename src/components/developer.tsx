@@ -62,41 +62,8 @@ export function Developer({
               </option>
             ))}
           </select>
-          {state.developerSignedIn ? (
-            <button
-              className="secondary"
-              onClick={() => {
-                set((s) => ({ ...s, developerSignedIn: false }));
-                location.hash = `developer/${type}`;
-              }}
-            >
-              Log out of demo
-            </button>
-          ) : (
-            <LinkButton to="account/developer" secondary>
-              Log in or create a Free Account
-            </LinkButton>
-          )}
         </div>
       </div>
-      <p className="fine">
-        Free for infrastructure developers. Log in or create a free account to
-        browse property details.
-      </p>
-      <nav className="tabs" aria-label="Developer workspace">
-        <a
-          className={tab === "featured" ? "active" : ""}
-          href={`#developer/${type}`}
-        >
-          Featured Properties
-        </a>
-        <a
-          className={tab === "pending" ? "active" : ""}
-          href="#developer/pending"
-        >
-          Pending Offers <span className="count">{state.inquiries.length}</span>
-        </a>
-      </nav>
       {tab === "pending" ? (
         <>
           <h2>Pending Offers</h2>

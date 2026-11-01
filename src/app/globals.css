@@ -1657,3 +1657,55 @@ blockquote {
     display: block;
   }
 }
+
+/* Shared marketing-site account entry points lead to the separate customer app. */
+.site-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+}
+.header-account-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.header-account-actions .button {
+  font-size: 12px;
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+@media (max-width: 1150px) {
+  .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .site-header nav {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+  .header-account-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+@media (max-width: 600px) {
+  .site-header {
+    gap: 12px 8px;
+  }
+  .site-header .brand small {
+    max-width: 70px;
+    font-size: 7px;
+  }
+  .header-account-actions {
+    gap: 5px;
+  }
+  .header-account-actions .button {
+    font-size: 10px;
+    padding: 8px 7px;
+  }
+}
+@media (max-width: 380px) {
+  .site-header .brand small {
+    display: none;
+  }
+}
