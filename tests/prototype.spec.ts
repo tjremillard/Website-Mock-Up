@@ -95,19 +95,21 @@ test("Explore feasibility preview, stable scores, resubmission and pricing", asy
   ).toBeTruthy();
   await page
     .getByRole("link", {
-      name: "Subscribe to get the full report and receive Easement Real Estate’s Marketing Services!",
+      name: "Subscribe to get the full report and begin marketing your property to infrastructure developers with Easement Exchange!",
       exact: true,
     })
     .click();
   await expect(page).toHaveURL(/#owner\/pricing$/);
   await expect(
-    page.getByRole("heading", { name: "Marketing Services pricing" }),
+    page.getByRole("heading", {
+      name: "Put your property’s potential to work.",
+    }),
   ).toBeVisible();
   await expect(
     page.locator(".site-header nav a[aria-current='page']"),
   ).toHaveText("Property Owners");
   await expect(
-    page.getByText("Pricing and subscription details are coming soon."),
+    page.getByRole("heading", { name: "Services", exact: true }),
   ).toBeVisible();
 });
 test("lease review checkout, manual stages, report and persistence", async ({
@@ -164,7 +166,7 @@ test("lease review checkout, manual stages, report and persistence", async ({
 test("owner opportunities, saved interest, and additional documents", async ({
   page,
 }) => {
-  await page.goto("/#owner/overview");
+  await page.goto("/#owner/workspace");
   await expect(page.getByText("T-Mobile escalation coming up")).toBeVisible();
   await page
     .getByRole("button", { name: "Learn more about Community Solar" })
@@ -189,31 +191,41 @@ test("owner opportunities, saved interest, and additional documents", async ({
   await page.reload();
   await expect(page.locator(".document-row")).toHaveCount(4);
 });
-test("developer account, filters, access tiers, and pending inquiry", async ({
+test("developer property gate, free account, and pending inquiry", async ({
   page,
 }) => {
   await page.goto("/#developer");
-  await expect(page.locator(".property-card")).toHaveCount(4);
-  await page.getByRole("link", { name: "Create your account" }).click();
+  await expect(page.locator(".property-card")).toHaveCount(5);
+  await expect(page.getByText("Catalog access", { exact: false })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByText("Property criteria", { exact: false }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "View 9 Summer Street", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#account\/developer\/wireless\/summer$/);
+  await expect(
+    page.getByRole("heading", { name: "Create a Free Account", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".property-detail")).toHaveCount(0);
   await page.getByLabel("Name", { exact: true }).fill("Demo Developer");
+  await page
+    .getByLabel("Email", { exact: true })
+    .fill("developer@example.test");
   await page.getByLabel("Users on your team").fill("3");
-  await page.getByLabel("Minimum rooftop size").fill("10000");
-  await page.getByLabel("Require access to the grid").check();
-  await page.getByRole("button", { name: "Create demo account" }).click();
-  await expect(page.locator(".property-card")).toHaveCount(1);
-  await expect(page.locator(".property-card")).toContainText("123 Main Street");
+  await page
+    .getByRole("button", { name: "Create Free Account", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#developer\/wireless\/summer$/);
+  await expect(page.locator(".property-detail")).toContainText(
+    "9 Summer Street",
+  );
   await page.reload();
   await expect(
     page.getByText("Welcome, Demo Developer.", { exact: false }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Clear criteria" }).click();
-  await page.locator(".developer-access summary").click();
-  await page.getByRole("button", { name: "Preview paid access" }).click();
-  await expect(page.locator(".property-card")).toHaveCount(5);
-  await page
-    .getByRole("button", { name: "View property & request introduction" })
-    .nth(1)
-    .click();
   await page
     .getByLabel("Your project and introduction request")
     .fill("We are exploring rooftop infrastructure.");
@@ -225,24 +237,51 @@ test("developer account, filters, access tiers, and pending inquiry", async ({
     page.getByText("We are exploring rooftop infrastructure."),
   ).toBeVisible();
   await expect(page.locator(".pending-row")).toHaveCount(2);
-  await expect(page.getByText("Inquiry sent 2/17/2027")).toBeVisible();
   await page.reload();
   await expect(page.locator(".pending-row")).toHaveCount(2);
 });
-test("developer criteria use all requirements and show empty states", async ({
+
+test("developer login returns to chosen property and direct links stay gated", async ({
   page,
 }) => {
-  await page.goto("/#developer");
-  await page.getByLabel("Maximum distance to fiber").fill("100");
+  await page.goto("/#developer/battery/battery-office");
   await expect(
-    page.getByRole("heading", { name: "No matching properties" }),
+    page.getByRole("heading", { name: "Create a Free Account", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Clear criteria" }).click();
-  await page.getByLabel("Maximum distance to utilities").fill("150");
-  await expect(page.locator(".property-card")).toHaveCount(1);
-  await page.getByRole("button", { name: "Clear criteria" }).click();
+  await page.getByLabel("Name", { exact: true }).fill("Battery Developer");
+  await page.getByLabel("Email", { exact: true }).fill("battery@example.test");
+  await page
+    .getByRole("button", { name: "Create Free Account", exact: true })
+    .click();
+  await expect(page.locator(".property-detail")).toContainText(
+    "16 Technology Drive",
+  );
+  await page
+    .getByRole("button", { name: "Log out of demo", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "View 210 River Street on map", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Log in", exact: true }).click();
+  await page.getByLabel("Email", { exact: true }).fill("unknown@example.test");
+  await page
+    .getByRole("button", { name: "Log in to demo", exact: true })
+    .click();
+  await expect(page.locator(".account-page").getByRole("alert")).toContainText(
+    "No demo account",
+  );
+  await page.getByLabel("Email", { exact: true }).fill("battery@example.test");
+  await page
+    .getByRole("button", { name: "Log in to demo", exact: true })
+    .click();
+  await expect(page.locator(".property-detail")).toContainText(
+    "210 River Street",
+  );
+  await page
+    .getByRole("link", { name: "Browse properties", exact: false })
+    .click();
   await page.getByRole("button", { name: "List", exact: true }).click();
-  await expect(page.locator(".property-card.horizontal")).toHaveCount(4);
+  await expect(page.locator(".property-card.horizontal")).toHaveCount(5);
 });
 test("SCIP billing and saved review draft retain selected plan", async ({
   page,
@@ -411,7 +450,7 @@ test("developer types switch CRE catalogs and map layers", async ({ page }) => {
   ];
   for (const config of configurations) {
     await selector.selectOption(config.type);
-    await expect(page.locator(".property-card")).toHaveCount(4);
+    await expect(page.locator(".property-card")).toHaveCount(5);
     for (const building of [
       "Multifamily building",
       "Office building",
@@ -420,7 +459,7 @@ test("developer types switch CRE catalogs and map layers", async ({ page }) => {
     ]) {
       await expect(
         page.locator(".property-card").filter({ hasText: building }),
-      ).toHaveCount(1);
+      ).toHaveCount(building === "Warehouse" ? 2 : 1);
     }
     await expect(page.locator(".property-card").first()).toContainText(
       config.address,
@@ -444,7 +483,7 @@ test("developer types switch CRE catalogs and map layers", async ({ page }) => {
     await expect(page.locator(".infrastructure-marker")).toHaveCount(
       (config.layers.length - 1) * 3,
     );
-    await expect(page.locator(".property-card")).toHaveCount(4);
+    await expect(page.locator(".property-card")).toHaveCount(5);
     await toggle.check();
     await page
       .getByRole("button", {
@@ -452,25 +491,20 @@ test("developer types switch CRE catalogs and map layers", async ({ page }) => {
         exact: true,
       })
       .click();
-    await expect(page.locator(".property-detail")).toContainText(
-      config.address,
+    await expect(page).toHaveURL(
+      new RegExp(`#account/developer/${config.type}/`),
     );
     await expect(
-      page.getByRole("button", {
-        name: `View ${config.address} on map`,
-        exact: true,
-      }),
-    ).toHaveAttribute("aria-pressed", "true");
+      page.getByRole("heading", { name: "Create a Free Account", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Log in", exact: true }),
+    ).toBeVisible();
+    await page.goBack();
+    await expect(selector).toHaveValue(config.type);
   }
   await selector.selectOption("wireless");
-  await expect(page.locator(".property-detail")).toHaveCount(0);
-  await expect(page.locator(".developer-property-pin")).toHaveCount(4);
-  await page.getByLabel("Maximum distance to fiber").fill("100");
-  await expect(page.locator(".developer-property-pin")).toHaveCount(0);
-  await expect(
-    page.getByRole("heading", { name: "No matching properties" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Clear criteria" }).click();
+  await expect(page.locator(".developer-property-pin")).toHaveCount(5);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({
     path: "test-results/developer-desktop.png",
@@ -493,4 +527,134 @@ test("developer types switch CRE catalogs and map layers", async ({ page }) => {
     path: "test-results/developer-mobile.png",
     fullPage: true,
   });
+});
+
+test("save complimentary preview through free owner signup without changing scores", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Enter your property address")
+    .fill("25 Commerce Avenue");
+  await page
+    .getByRole("button", { name: "Explore Property", exact: true })
+    .click();
+  const scores = await page
+    .locator(".feasibility-dial strong")
+    .allTextContents();
+  await page
+    .getByRole("link", {
+      name: "Save Complimentary Easement Marketing Feasibility Analysis",
+      exact: true,
+    })
+    .click();
+  await expect(page).toHaveURL(/#account\/owner\/save$/);
+  await page.getByLabel("Name", { exact: true }).fill("Property Owner");
+  await page.getByLabel("Email", { exact: true }).fill("owner@example.test");
+  await page
+    .getByRole("button", { name: "Create Free Account", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#owner\/analyses$/);
+  await expect(page.locator(".saved-analysis h3")).toHaveText(
+    "25 Commerce Avenue",
+  );
+  await expect(page.locator(".saved-analysis dd")).toHaveText(scores);
+  await page.reload();
+  await expect(page.locator(".saved-analysis dd")).toHaveText(scores);
+  await page.getByRole("link", { name: "Explore", exact: true }).click();
+  await expect(page.locator(".feasibility-dial strong")).toHaveText(scores);
+  await page
+    .getByRole("link", {
+      name: "Save Complimentary Easement Marketing Feasibility Analysis",
+      exact: true,
+    })
+    .click();
+  await page.getByRole("button", { name: "Log in", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Log in to demo", exact: true })
+    .click();
+  await expect(page.locator(".saved-analysis")).toHaveCount(1);
+  await page
+    .getByLabel("Property addresses · one per line")
+    .fill("14 Sunfield Avenue\n82 Market Street\n14 Sunfield Avenue");
+  await page
+    .getByRole("button", { name: "Preview portfolio feasibility", exact: true })
+    .click();
+  await expect(page.locator(".saved-analysis")).toHaveCount(3);
+  await page.screenshot({
+    path: "test-results/owner-saved-analyses.png",
+    fullPage: true,
+  });
+});
+
+test("Property Owners service prices, plan selection, and mobile layout", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("link", { name: "Property Owners", exact: true })
+    .click();
+  await expect(page.locator(".owner-plan-grid .card")).toHaveCount(4);
+  const plans = page.locator(".owner-plan-grid .card");
+  await expect(plans.nth(0)).toContainText("entire portfolio");
+  await expect(plans.nth(1)).toContainText("$499/year");
+  await expect(plans.nth(1)).toContainText("One property marketed");
+  await expect(plans.nth(2)).toContainText("2–9 properties marketed");
+  await expect(plans.nth(2)).toContainText(
+    "+ $99/year for every additional property",
+  );
+  await expect(plans.nth(3)).toContainText(
+    "+ $49/year for every additional property",
+  );
+  await expect(plans.nth(3)).toContainText("Recommended");
+  await page.screenshot({
+    path: "test-results/owner-services-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await page.screenshot({
+    path: "test-results/owner-services-mobile.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("link", { name: "Choose Mid-Market", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#account\/owner\/mid-market$/);
+  await expect(
+    page.getByText("Selected service: Mid-Market.", { exact: false }),
+  ).toBeVisible();
+  await page.getByLabel("Name", { exact: true }).fill("Portfolio Owner");
+  await page
+    .getByLabel("Email", { exact: true })
+    .fill("portfolio@example.test");
+  await page
+    .getByRole("button", { name: "Create Free Account", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#owner\/pricing$/);
+  await expect(page.getByRole("status")).toContainText(
+    "No subscription has been activated",
+  );
+});
+
+test("legacy catalog restrictions no longer limit developer listings", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "easement-prototype-v1",
+      JSON.stringify({
+        criteria: { roof: "999999", fiber: "1", utilities: "1", grid: true },
+        access: "friendly",
+      }),
+    ),
+  );
+  await page.goto("/#developer");
+  await expect(page.locator(".property-card")).toHaveCount(5);
+  await expect(page.locator(".developer-access, .criteria")).toHaveCount(0);
 });

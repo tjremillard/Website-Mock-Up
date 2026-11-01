@@ -43,11 +43,7 @@ export function Explore() {
   const [address, setAddress] = useState(
     state.address === "123 Main Street" ? "" : state.address,
   );
-  const [result, setResult] = useState<{
-    address: string;
-    scores: FeasibilityScore[];
-    submission: number;
-  } | null>(null);
+  const result = state.feasibilityPreview;
   return (
     <>
       <section className={result ? "page explore-search" : "landing"}>
@@ -68,12 +64,15 @@ export function Explore() {
             const submittedAddress = address.trim();
             if (!submittedAddress) return;
             const scores = generatePrototypeScores();
-            setResult((previous) => ({
+            set((s) => ({
+              ...s,
               address: submittedAddress,
-              scores,
-              submission: (previous?.submission ?? 0) + 1,
+              feasibilityPreview: {
+                address: submittedAddress,
+                scores,
+                submission: (s.feasibilityPreview?.submission ?? 0) + 1,
+              },
             }));
-            set((s) => ({ ...s, address: submittedAddress }));
           }}
         >
           <label className="sr-only" htmlFor="address">
@@ -128,9 +127,16 @@ export function Explore() {
             demonstration purposes.
           </p>
           <div className="feasibility-cta">
+            <a
+              className="button secondary"
+              href="#account/owner/save"
+              onClick={() => set((s) => ({ ...s, pendingAnalysis: result }))}
+            >
+              Save Complimentary Easement Marketing Feasibility Analysis
+            </a>
             <LinkButton to="owner/pricing">
-              Subscribe to get the full report and receive Easement Real
-              Estate’s Marketing Services!
+              Subscribe to get the full report and begin marketing your property
+              to infrastructure developers with Easement Exchange!
             </LinkButton>
           </div>
         </section>

@@ -47,7 +47,7 @@ export function Owner({ tab = "overview" }: { tab?: string }) {
             key={k}
             className={tab === k ? "active" : ""}
             aria-current={tab === k ? "page" : undefined}
-            href={"#owner/" + k}
+            href={"#owner/" + (k === "overview" ? "workspace" : k)}
           >
             {l}
           </a>

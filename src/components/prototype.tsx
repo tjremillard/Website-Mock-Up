@@ -6,7 +6,10 @@ import { Explore } from "./explore";
 import { EasementIncome } from "./income";
 import { Services, Product } from "./services";
 import { Owner } from "./owner";
-import { Account, Developer } from "./developer";
+import { Developer } from "./developer";
+import { Account } from "./account";
+import { PropertyOwners, OwnerAnalyses } from "./property-owners";
+import { developerTypes, type DeveloperType } from "@/lib/developer-catalog";
 import { ReviewForm, Checkout, Submitted, Report } from "./reviews";
 const nav = [
   ["explore", "Explore"],
@@ -19,7 +22,11 @@ export function Prototype() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [route]);
-  const [screen, arg] = route.split("/");
+  const [screen, arg, context, propertyId] = route.split("/");
+  const selectedType =
+    arg && Object.hasOwn(developerTypes, arg)
+      ? (arg as DeveloperType)
+      : undefined;
   const service =
     arg && Object.hasOwn(services, arg) ? (arg as ServiceKey) : undefined;
   let content;
@@ -52,15 +59,12 @@ export function Prototype() {
       content = <Report id={arg} />;
       break;
     case "owner":
-      if (arg === "pricing") {
-        content = (
-          <section className="page">
-            <p className="eyebrow">Property Owners</p>
-            <h1>Marketing Services pricing</h1>
-            <p>Pricing and subscription details are coming soon.</p>
-            <a href="#explore">Return to Explore</a>
-          </section>
-        );
+      if (!arg || arg === "overview" || arg === "pricing") {
+        content = <PropertyOwners />;
+        break;
+      }
+      if (arg === "analyses") {
+        content = <OwnerAnalyses />;
         break;
       }
       content = (
@@ -74,10 +78,28 @@ export function Prototype() {
       );
       break;
     case "developer":
-      content = <Developer tab={arg === "pending" ? "pending" : "featured"} />;
+      content = (
+        <Developer
+          key={route}
+          tab={arg === "pending" ? "pending" : "featured"}
+          type={selectedType}
+          propertyId={context}
+        />
+      );
       break;
     case "account":
-      content = <Account />;
+      content = (
+        <Account
+          key={route}
+          audience={arg === "owner" ? "owner" : "developer"}
+          context={context}
+          returnTo={
+            context && Object.hasOwn(developerTypes, context) && propertyId
+              ? `developer/${context}/${propertyId}`
+              : "developer"
+          }
+        />
+      );
       break;
   }
   return (
@@ -106,6 +128,9 @@ export function Prototype() {
             const active =
               screen === to.split("/")[0] ||
               (to === "explore" && screen === "map") ||
+              (screen === "account" &&
+                to.split("/")[0] ===
+                  (arg === "owner" ? "owner" : "developer")) ||
               (to === "income" &&
                 [
                   "services",

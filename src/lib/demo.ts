@@ -1,3 +1,5 @@
+import type { FeasibilityScore } from "./feasibility";
+
 // All data is illustrative. Replace this boundary with authenticated warehouse APIs.
 export const services = {
   checkup: {
@@ -89,12 +91,13 @@ export const properties = [
     tone: "blue",
   },
 ];
-export type Criteria = {
-  roof: string;
-  fiber: string;
-  utilities: string;
-  grid: boolean;
+export type FeasibilityPreview = {
+  address: string;
+  scores: FeasibilityScore[];
+  submission: number;
 };
+export type OwnerPlan = "baseline" | "mid-market" | "portfolio";
+export type DemoAccount = { name: string; email?: string; users?: string };
 export type Review = {
   id: string;
   service: ServiceKey;
@@ -116,26 +119,21 @@ export type DemoState = {
     documents: string[];
     billing: "annual" | "monthly";
   };
-  account?: { name: string; users: string; criteria: Criteria };
-  criteria: Criteria;
+  account?: DemoAccount;
+  developerSignedIn?: boolean;
+  ownerAccount?: DemoAccount;
+  ownerSignedIn?: boolean;
+  ownerPlan?: OwnerPlan;
+  feasibilityPreview?: FeasibilityPreview;
+  pendingAnalysis?: FeasibilityPreview;
+  savedAnalyses?: FeasibilityPreview[];
   inquiries: { property: string; date: string; message?: string }[];
-  access: "friendly" | "entire";
   interests: string[];
 };
 export const initialState: DemoState = {
   address: "123 Main Street",
   documents: initialDocs,
   reviews: [],
-  criteria: { roof: "", fiber: "", utilities: "", grid: false },
   inquiries: [{ property: "123 Main Street", date: "2027-02-17" }],
-  access: "friendly",
   interests: [],
 };
-export function matches(p: (typeof properties)[number], c: Criteria) {
-  return (
-    p.roof >= Number(c.roof || 0) &&
-    (!c.fiber || p.fiber <= Number(c.fiber)) &&
-    (!c.utilities || p.utilities <= Number(c.utilities)) &&
-    (!c.grid || p.grid)
-  );
-}
