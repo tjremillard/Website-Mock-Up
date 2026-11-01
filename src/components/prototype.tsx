@@ -9,8 +9,8 @@ import { Account, Developer } from "./developer";
 import { ReviewForm, Checkout, Submitted, Report } from "./reviews";
 const nav = [
   ["explore", "Explore"],
-  ["owner/overview", "Owner Portal"],
-  ["services", "Services & Pricing"],
+  ["services", "Easement Income"],
+  ["owner/overview", "Property Owners"],
   ["developer", "Infrastructure Developers"],
 ];
 export function Prototype() {
@@ -27,7 +27,7 @@ export function Prototype() {
       content = <Explore />;
       break;
     case "map":
-      content = <Explore map />;
+      content = <Explore />;
       break;
     case "services":
       content = <Services />;
@@ -48,6 +48,17 @@ export function Prototype() {
       content = <Report id={arg} />;
       break;
     case "owner":
+      if (arg === "pricing") {
+        content = (
+          <section className="page">
+            <p className="eyebrow">Property Owners</p>
+            <h1>Marketing Services pricing</h1>
+            <p>Pricing and subscription details are coming soon.</p>
+            <a href="#explore">Return to Explore</a>
+          </section>
+        );
+        break;
+      }
       content = (
         <Owner
           tab={

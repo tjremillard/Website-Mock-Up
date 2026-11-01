@@ -59,3 +59,15 @@ Local-port restrictions may require the platform's supported execution approval;
 ## Source preservation
 
 Work on `feature/deck-rebuild-and-portals`. Keep the prior starter and subsequent features unless the owner approves removal. Review `git diff` before a descriptive commit. Push only with authorization; GitHub becomes the durable source of truth once that push succeeds. Local commits and ZIP backups alone are not a GitHub backup. Use feature branches and pull requests; do not force-push or reset user work.
+
+## Version 2 — Explore feasibility preview
+
+Work exclusively on `redesign/v2`. Version 1 remains at annotated tag `v1.0.0` and branch `archive/v1-original`, commit `d5748e196770c3d19ccfdecd22a1ff38b311026c`.
+
+Primary navigation is Explore, Easement Income (existing services), Property Owners (existing owner workspace), Infrastructure Developers. Other portal functionality is preserved pending new requirements.
+
+Explore keeps the address-first landing style and now shows four complimentary tenant-interest dials after a nonempty trimmed address submission. `src/lib/feasibility.ts` generates four independent random integer percentages from 0 through 100; `src/components/explore.tsx` stores the submitted address and scores together in React state. Scores stay fixed across rerenders and address edits until submission; leaving Explore or refreshing resets this preview. No assessment, AI, API, registration, or payment is involved. Replace the generator boundary with the future category-specific model when specified.
+
+Explore has no maps or technical data layers. The legacy `#map` link now opens the same Explore preview entry point. The CTA opens `#owner/pricing`, a minimal Property Owners placeholder with no plans, prices, or checkout. Dials interpolate hue continuously from red (0) through yellow (50) to green (100), include accessible meter values and text percentages, and animate with reduced-motion support. The grid uses four desktop columns, two tablet columns, and one narrow-mobile column.
+
+The earlier screen map and map-layer behavior above describe Version 1; this section supersedes those descriptions for Version 2 Explore only. Browser coverage verifies blank submission, all four categories, 0/50/100 boundaries, independent draws, stable scores during input rerenders, resubmission, responsive layout, and the pricing CTA, alongside the retained portal regressions.

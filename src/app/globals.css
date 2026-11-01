@@ -1168,3 +1168,119 @@ blockquote {
     transition: none !important;
   }
 }
+
+/* Version 2: complimentary Explore feasibility preview. */
+.explore-search .address-search {
+  display: flex;
+  gap: 8px;
+  max-width: 660px;
+  margin: 28px 0 0;
+}
+.feasibility-results {
+  padding-top: 0;
+}
+.submitted-address {
+  overflow-wrap: anywhere;
+}
+.feasibility-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin: 28px 0;
+}
+.feasibility-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+  animation: feasibility-enter 600ms ease-out both;
+}
+.feasibility-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+.feasibility-card:nth-child(3) {
+  animation-delay: 160ms;
+}
+.feasibility-card:nth-child(4) {
+  animation-delay: 240ms;
+}
+.feasibility-card h2 {
+  font-size: 17px;
+  letter-spacing: 0;
+  margin: 18px 0 0;
+}
+.feasibility-dial {
+  position: relative;
+  max-width: 190px;
+  margin: auto;
+}
+.feasibility-dial svg {
+  display: block;
+  width: 100%;
+  transform: rotate(-90deg);
+}
+.feasibility-dial circle {
+  fill: none;
+  stroke-width: 9;
+}
+.feasibility-dial .dial-track {
+  stroke: #edf1e9;
+}
+.feasibility-dial strong {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+}
+.feasibility-scale {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.feasibility-scale::before {
+  content: "";
+  width: 100%;
+  height: 8px;
+  border-radius: 8px;
+  background: linear-gradient(
+    to right,
+    hsl(0, 72%, 42%),
+    hsl(60, 72%, 42%),
+    hsl(120, 72%, 42%)
+  );
+}
+.prototype-score-notice {
+  color: var(--ink);
+}
+.feasibility-cta {
+  margin: 28px 0;
+  text-align: center;
+}
+@keyframes feasibility-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 850px) {
+  .feasibility-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .feasibility-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feasibility-card {
+    animation: none;
+  }
+}

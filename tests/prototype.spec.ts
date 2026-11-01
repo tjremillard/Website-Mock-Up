@@ -1,23 +1,114 @@
 import { test, expect } from "@playwright/test";
-test("address explorer and map layers", async ({ page }) => {
+test("Explore feasibility preview, stable scores, resubmission and pricing", async ({
+  page,
+}) => {
   await page.goto("/");
-  await expect(page.locator(".site-header")).toHaveCSS("display", "flex");
+  await expect(page.locator(".site-header nav a")).toHaveText([
+    "Explore",
+    "Easement Income",
+    "Property Owners",
+    "Infrastructure Developers",
+  ]);
   await expect(page.locator(".landing h1")).toHaveCSS("font-size", "38px");
   await expect(
-    page.getByRole("heading", { name: "What’s possible at your property?" }),
+    page.getByText(
+      "Enter an address to receive our Easement Marketing Feasibility Analysis.",
+    ),
   ).toBeVisible();
-  await page.getByLabel("Enter your property address").fill("123 Main Street");
-  await page.getByRole("button", { name: "Explore property" }).click();
-  await expect(
-    page.getByText("123 Main Street", { exact: true }),
-  ).toBeVisible();
-  await expect(page.locator(".map-marker")).toHaveCount(6);
-  await page.getByLabel("FCC Database").uncheck();
-  await expect(page.locator(".map-marker")).toHaveCount(4);
-  await page.getByRole("link", { name: "Change address" }).click();
-  await expect(page.getByLabel("Enter your property address")).toHaveValue(
+  const input = page.getByLabel("Enter your property address");
+  const submit = page.getByRole("button", {
+    name: "Explore Property",
+    exact: true,
+  });
+  await input.fill("   ");
+  await submit.click();
+  await expect(page.getByRole("meter")).toHaveCount(0);
+  await page.evaluate(() => {
+    Math.random = () => 0;
+  });
+  await input.fill("  123 Main Street  ");
+  await submit.click();
+  await expect(page.locator(".submitted-address")).toHaveText(
     "123 Main Street",
   );
+  const meters = page.getByRole("meter");
+  await expect(meters).toHaveCount(4);
+  const categories = [
+    "Wireless Infrastructure Feasibility",
+    "Solar Feasibility",
+    "Battery Energy Storage Feasibility",
+    "Outdoor Advertising Feasibility",
+  ];
+  for (const category of categories) {
+    await expect(
+      page.getByRole("meter", { name: category, exact: true }),
+    ).toHaveAttribute("aria-valuenow", "0");
+  }
+  await expect(page.locator(".map-canvas")).toHaveCount(0);
+  await expect(
+    page.getByText(
+      "Prototype preview: these scores are randomly generated for demonstration purposes.",
+    ),
+  ).toBeVisible();
+  // Editing the controlled input rerenders Explore without generating new scores.
+  await page.evaluate(() => {
+    Math.random = () => 0.999999;
+  });
+  await input.fill("9 Summer Street");
+  for (const meter of await meters.all())
+    await expect(meter).toHaveAttribute("aria-valuenow", "0");
+  await expect(page.locator(".submitted-address")).toHaveText(
+    "123 Main Street",
+  );
+  await submit.click();
+  await expect(page.locator(".submitted-address")).toHaveText(
+    "9 Summer Street",
+  );
+  for (const meter of await meters.all())
+    await expect(meter).toHaveAttribute("aria-valuenow", "100");
+  // Four independent draws, including the middle of the spectrum.
+  await page.evaluate(() => {
+    let draw = 0;
+    const values = [0, 0.5, 0.999999, 0.25];
+    Math.random = () => values[draw++ % 4];
+  });
+  await submit.click();
+  await expect(page.locator(".feasibility-dial strong")).toHaveText([
+    "0%",
+    "50%",
+    "100%",
+    "25%",
+  ]);
+  await expect(page.locator(".feasibility-grid")).toHaveCSS(
+    "grid-template-columns",
+    /(?:[\d.]+px\s+){3}[\d.]+px/,
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator(".feasibility-grid")).toHaveCSS(
+    "grid-template-columns",
+    /^[\d.]+px$/,
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await page
+    .getByRole("link", {
+      name: "Subscribe to get the full report and receive Easement Real Estate’s Marketing Services!",
+      exact: true,
+    })
+    .click();
+  await expect(page).toHaveURL(/#owner\/pricing$/);
+  await expect(
+    page.getByRole("heading", { name: "Marketing Services pricing" }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".site-header nav a[aria-current='page']"),
+  ).toHaveText("Property Owners");
+  await expect(
+    page.getByText("Pricing and subscription details are coming soon."),
+  ).toBeVisible();
 });
 test("lease review checkout, manual stages, report and persistence", async ({
   page,
