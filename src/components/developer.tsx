@@ -1,8 +1,14 @@
 "use client";
 import { useState } from "react";
-import { properties, matches, type Criteria } from "@/lib/demo";
+import { matches, type Criteria } from "@/lib/demo";
 import { useDemo } from "@/lib/demo-store";
-import { Card, Heading, LinkButton, PropertyArt } from "./ui";
+import { Card, Heading, LinkButton } from "./ui";
+import {
+  developerTypes,
+  getDeveloperProperties,
+  type DeveloperType,
+} from "@/lib/developer-catalog";
+import { CommercialBuildingArt, DeveloperMap } from "./developer-map";
 export function CriteriaFields({
   value,
   onChange,
@@ -140,6 +146,8 @@ export function Developer({ tab = "featured" }: { tab?: string }) {
   const [selected, setSelected] = useState("");
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [developerType, setDeveloperType] = useState<DeveloperType>("wireless");
+  const properties = getDeveloperProperties(developerType);
   const [view, setView] = useState<"grid" | "list">("grid");
   const visible = properties.filter(
     (p) =>
@@ -147,8 +155,8 @@ export function Developer({ tab = "featured" }: { tab?: string }) {
   );
   const property = properties.find((p) => p.id === selected);
   return (
-    <div className="page">
-      <div className="spread">
+    <div className="page developer-page">
+      <div className="spread developer-header">
         <Heading
           eyebrow="Infrastructure workspace"
           title="Infrastructure Developer Portal"
@@ -157,48 +165,75 @@ export function Developer({ tab = "featured" }: { tab?: string }) {
             ? `Welcome, ${state.account.name}. Find the right place for your next project.`
             : "Discover properties. Connect with owners. Build what’s next."}
         </Heading>
-        <LinkButton to="account" secondary>
-          {state.account ? "Edit demo account" : "Create your account"}
-        </LinkButton>
-      </div>
-      <div className="two-col access-plans">
-        <Card className={state.access === "friendly" ? "selected" : ""}>
-          <p className="eyebrow">Start a conversation</p>
-          <h2>Access to friendly owners</h2>
-          <div className="small-price">Free</div>
-          <p className="muted">
-            Initial outreach facilitated through the platform. Explore owners
-            open to infrastructure opportunities.
-          </p>
-          <button
-            className={state.access === "friendly" ? "secondary" : "primary"}
-            onClick={() => set((s) => ({ ...s, access: "friendly" }))}
+        <div className="developer-type-control">
+          <label htmlFor="developer-type">Infrastructure Developer Type</label>
+          <select
+            id="developer-type"
+            value={developerType}
+            onChange={(e) => {
+              setDeveloperType(e.target.value as DeveloperType);
+              setSelected("");
+              setMessage("");
+              setFeedback("");
+            }}
           >
-            {state.access === "friendly"
-              ? "Viewing friendly owners"
-              : "View friendly owners"}
-          </button>
-        </Card>
-        <Card className={state.access === "entire" ? "selected" : ""}>
-          <p className="eyebrow">Broaden your search</p>
-          <h2>Access to entire ESO database</h2>
-          <div className="small-price">
-            Paid <span className="fine">· pricing TBD</span>
-          </div>
-          <p className="muted">
-            Preview the expanded sample catalog. Real access and billing will be
-            connected by your developer.
-          </p>
-          <button
-            className="secondary"
-            onClick={() => set((s) => ({ ...s, access: "entire" }))}
-          >
-            {state.access === "entire"
-              ? "Previewing expanded sample catalog"
-              : "Preview paid access · no charge"}
-          </button>
-        </Card>
+            {Object.entries(developerTypes).map(([value, config]) => (
+              <option key={value} value={value}>
+                {config.label}
+              </option>
+            ))}
+          </select>
+          <LinkButton to="account" secondary>
+            {state.account ? "Edit demo account" : "Create your account"}
+          </LinkButton>
+        </div>
       </div>
+      <details className="developer-access">
+        <summary>
+          Catalog access ·{" "}
+          {state.access === "friendly"
+            ? "Friendly owners · Free"
+            : "Expanded catalog · demo"}
+        </summary>
+        <div className="two-col access-plans">
+          <Card className={state.access === "friendly" ? "selected" : ""}>
+            <p className="eyebrow">Start a conversation</p>
+            <h2>Access to friendly owners</h2>
+            <div className="small-price">Free</div>
+            <p className="muted">
+              Initial outreach facilitated through the platform. Explore owners
+              open to infrastructure opportunities.
+            </p>
+            <button
+              className={state.access === "friendly" ? "secondary" : "primary"}
+              onClick={() => set((s) => ({ ...s, access: "friendly" }))}
+            >
+              {state.access === "friendly"
+                ? "Viewing friendly owners"
+                : "View friendly owners"}
+            </button>
+          </Card>
+          <Card className={state.access === "entire" ? "selected" : ""}>
+            <p className="eyebrow">Broaden your search</p>
+            <h2>Access to entire ESO database</h2>
+            <div className="small-price">
+              Paid <span className="fine">· pricing TBD</span>
+            </div>
+            <p className="muted">
+              Preview the expanded sample catalog. Real access and billing will
+              be connected by your developer.
+            </p>
+            <button
+              className="secondary"
+              onClick={() => set((s) => ({ ...s, access: "entire" }))}
+            >
+              {state.access === "entire"
+                ? "Previewing expanded sample catalog"
+                : "Preview paid access · no charge"}
+            </button>
+          </Card>
+        </div>
+      </details>
       <nav className="tabs" aria-label="Developer workspace">
         <a className={tab === "featured" ? "active" : ""} href="#developer">
           Featured Properties
@@ -261,10 +296,21 @@ export function Developer({ tab = "featured" }: { tab?: string }) {
               not verified site assessments.
             </p>
           </aside>
-          <div>
+          <div className="developer-listings">
+            <DeveloperMap
+              key={developerType}
+              type={developerType}
+              properties={visible}
+              selected={selected}
+              onSelect={(id) => {
+                setSelected(id);
+                setFeedback("");
+                setMessage("");
+              }}
+            />
             <div className="spread catalog-title">
               <div>
-                <h2>Featured Properties</h2>
+                <h2>Property Listing</h2>
                 <p className="fine" role="status">
                   {visible.length} properties match your criteria ·{" "}
                   {state.access === "friendly"
@@ -306,14 +352,15 @@ export function Developer({ tab = "featured" }: { tab?: string }) {
                     "property-card " + (view === "list" ? "horizontal" : "")
                   }
                 >
-                  <PropertyArt tone={p.tone} />
+                  <CommercialBuildingArt type={p.buildingType} />
                   <div className="property-content">
                     <span className="badge">
                       {p.friendly
                         ? "Friendly owner"
                         : "Expanded catalog · demo"}
                     </span>
-                    <h3>{p.address}</h3>
+                    <h3>{p.name}</h3>
+                    <p className="property-address">{p.address}</p>
                     <p className="muted">{p.city}</p>
                     <p>
                       {p.type} · {p.area}

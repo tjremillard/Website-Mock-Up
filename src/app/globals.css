@@ -1354,3 +1354,190 @@ blockquote {
     margin-top: 36px;
   }
 }
+
+/* CRE developer workspace. */
+.developer-page {
+  max-width: 1500px;
+}
+.developer-header {
+  align-items: flex-start;
+}
+.developer-type-control {
+  width: 310px;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.developer-type-control label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.developer-type-control select {
+  margin-top: 6px;
+}
+.developer-type-control .button {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.developer-access {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  padding: 14px 18px;
+  margin: 18px 0;
+}
+.developer-access summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.developer-access .access-plans {
+  margin-top: 20px;
+}
+.developer-listings {
+  min-width: 0;
+}
+.developer-map-section {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.developer-map-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 18px;
+}
+.developer-map-heading h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.developer-map-heading p {
+  margin: 0 0 4px;
+}
+.developer-map-canvas {
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+.developer-map-canvas > svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.sample-map-label {
+  position: absolute;
+  top: 10px;
+  left: 18px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #657971;
+}
+.infrastructure-marker {
+  position: absolute;
+  font-size: 21px;
+  text-shadow: 0 1px 2px white;
+}
+.infrastructure-marker-0 {
+  color: #705db1;
+}
+.infrastructure-marker-1 {
+  color: #b36b24;
+}
+.infrastructure-marker-2 {
+  color: #aa4e66;
+}
+.developer-property-pin {
+  position: absolute;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px #203d3933;
+  font-size: 12px;
+}
+.developer-property-pin.selected {
+  outline: 3px solid #b38335;
+}
+.developer-map-layers {
+  padding: 14px 18px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.developer-map-layers legend {
+  padding-top: 14px;
+  font-weight: 600;
+}
+.developer-map-layers label {
+  margin: 0;
+  font-size: 12px;
+}
+.developer-map-section > .fine {
+  padding: 12px 18px;
+  margin: 0;
+}
+.infrastructure-key {
+  font-size: 16px;
+}
+.commercial-building {
+  height: 180px;
+  overflow: hidden;
+  background: #dce9ec;
+}
+.commercial-building svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.property-card.horizontal .commercial-building {
+  height: 100%;
+  min-height: 200px;
+}
+.property-address {
+  margin-bottom: 4px;
+}
+.developer-page .catalog {
+  grid-template-columns: 230px minmax(0, 1fr);
+}
+.developer-page .property-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1150px) {
+  .developer-page .property-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 850px) {
+  .developer-page .catalog {
+    grid-template-columns: 1fr;
+  }
+  .developer-header {
+    flex-wrap: wrap;
+  }
+  .developer-type-control {
+    width: 100%;
+  }
+  .developer-page .criteria {
+    margin-bottom: 0;
+  }
+}
+@media (max-width: 600px) {
+  .developer-page .property-grid {
+    grid-template-columns: 1fr;
+  }
+  .developer-map-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .developer-map-canvas {
+    height: 240px;
+  }
+  .developer-page .property-card.horizontal .commercial-building {
+    height: 180px;
+  }
+}

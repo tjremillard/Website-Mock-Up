@@ -193,7 +193,7 @@ test("developer account, filters, access tiers, and pending inquiry", async ({
   page,
 }) => {
   await page.goto("/#developer");
-  await expect(page.locator(".property-card")).toHaveCount(2);
+  await expect(page.locator(".property-card")).toHaveCount(4);
   await page.getByRole("link", { name: "Create your account" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Demo Developer");
   await page.getByLabel("Users on your team").fill("3");
@@ -207,8 +207,9 @@ test("developer account, filters, access tiers, and pending inquiry", async ({
     page.getByText("Welcome, Demo Developer.", { exact: false }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Clear criteria" }).click();
+  await page.locator(".developer-access summary").click();
   await page.getByRole("button", { name: "Preview paid access" }).click();
-  await expect(page.locator(".property-card")).toHaveCount(3);
+  await expect(page.locator(".property-card")).toHaveCount(5);
   await page
     .getByRole("button", { name: "View property & request introduction" })
     .nth(1)
@@ -241,7 +242,7 @@ test("developer criteria use all requirements and show empty states", async ({
   await expect(page.locator(".property-card")).toHaveCount(1);
   await page.getByRole("button", { name: "Clear criteria" }).click();
   await page.getByRole("button", { name: "List", exact: true }).click();
-  await expect(page.locator(".property-card.horizontal")).toHaveCount(2);
+  await expect(page.locator(".property-card.horizontal")).toHaveCount(4);
 });
 test("SCIP billing and saved review draft retain selected plan", async ({
   page,
@@ -367,6 +368,129 @@ test("Easement Income explains the market and routes both audiences", async ({
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.screenshot({
     path: "test-results/income-desktop.png",
+    fullPage: true,
+  });
+});
+
+test("developer types switch CRE catalogs and map layers", async ({ page }) => {
+  await page.goto("/#developer");
+  const selector = page.getByLabel("Infrastructure Developer Type", {
+    exact: true,
+  });
+  await expect(selector.locator("option")).toHaveText([
+    "Wireless",
+    "Solar",
+    "Battery Energy Storage Systems",
+    "Outdoor Advertising",
+  ]);
+  const configurations = [
+    {
+      type: "wireless",
+      layers: [
+        "FCC Database",
+        "Proprietary Cell Site Structures",
+        "Deadzone Complaints",
+      ],
+      address: "123 Main Street",
+    },
+    {
+      type: "solar",
+      layers: ["Existing Solar Deployments"],
+      address: "14 Sunfield Avenue",
+    },
+    {
+      type: "battery",
+      layers: ["Existing BESS Deployments"],
+      address: "210 River Street",
+    },
+    {
+      type: "advertising",
+      layers: ["Existing billboard locations"],
+      address: "18 Avenue Square",
+    },
+  ];
+  for (const config of configurations) {
+    await selector.selectOption(config.type);
+    await expect(page.locator(".property-card")).toHaveCount(4);
+    for (const building of [
+      "Multifamily building",
+      "Office building",
+      "Mixed-use building",
+      "Warehouse",
+    ]) {
+      await expect(
+        page.locator(".property-card").filter({ hasText: building }),
+      ).toHaveCount(1);
+    }
+    await expect(page.locator(".property-card").first()).toContainText(
+      config.address,
+    );
+    const layerPanel = page.locator(".developer-map-layers");
+    await expect(layerPanel.getByRole("checkbox")).toHaveCount(
+      config.layers.length,
+    );
+    await expect(page.locator(".infrastructure-marker")).toHaveCount(
+      config.layers.length * 3,
+    );
+    for (const layer of config.layers)
+      await expect(
+        layerPanel.getByRole("checkbox", { name: layer, exact: true }),
+      ).toBeChecked();
+    const toggle = layerPanel.getByRole("checkbox", {
+      name: config.layers[0],
+      exact: true,
+    });
+    await toggle.uncheck();
+    await expect(page.locator(".infrastructure-marker")).toHaveCount(
+      (config.layers.length - 1) * 3,
+    );
+    await expect(page.locator(".property-card")).toHaveCount(4);
+    await toggle.check();
+    await page
+      .getByRole("button", {
+        name: `View ${config.address} on map`,
+        exact: true,
+      })
+      .click();
+    await expect(page.locator(".property-detail")).toContainText(
+      config.address,
+    );
+    await expect(
+      page.getByRole("button", {
+        name: `View ${config.address} on map`,
+        exact: true,
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+  }
+  await selector.selectOption("wireless");
+  await expect(page.locator(".property-detail")).toHaveCount(0);
+  await expect(page.locator(".developer-property-pin")).toHaveCount(4);
+  await page.getByLabel("Maximum distance to fiber").fill("100");
+  await expect(page.locator(".developer-property-pin")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "No matching properties" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Clear criteria" }).click();
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({
+    path: "test-results/developer-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await selector.selectOption("battery");
+  await expect(selector).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await expect(
+    page
+      .locator(".developer-map-layers")
+      .getByRole("checkbox", { name: "Existing BESS Deployments" }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "test-results/developer-mobile.png",
     fullPage: true,
   });
 });
