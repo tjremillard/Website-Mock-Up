@@ -293,3 +293,80 @@ test("mobile screens fit and original starter remains accessible", async ({
     page.getByRole("heading", { name: "Find room for your next chapter." }),
   ).toBeVisible();
 });
+
+test("Easement Income explains the market and routes both audiences", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("link", { name: "Easement Income", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#income$/);
+  await expect(
+    page.locator(".site-header nav a[aria-current='page']"),
+  ).toHaveText("Easement Income");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Your property’s potential goes beyond its traditional tenants.",
+  );
+  await expect(
+    page.getByText(
+      "A legal easement is a specific property right; not every opportunity on our platform requires one.",
+      { exact: false },
+    ),
+  ).toBeVisible();
+  for (const category of [
+    "Connectivity",
+    "Energy Generation",
+    "Energy Storage",
+    "Advertising",
+  ]) {
+    await expect(
+      page.getByRole("heading", { name: category, exact: true }),
+    ).toBeVisible();
+  }
+  await expect(
+    page.getByText("Free for infrastructure developers.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button")).toHaveCount(0);
+  await page
+    .getByRole("link", {
+      name: "Explore Your Property’s Potential",
+      exact: true,
+    })
+    .click();
+  await expect(page).toHaveURL(/#explore$/);
+  await expect(
+    page.getByRole("button", { name: "Explore Property", exact: true }),
+  ).toBeVisible();
+  await page.goBack();
+  await page.getByRole("link", { name: "Find Sites", exact: true }).click();
+  await expect(page).toHaveURL(/#developer$/);
+  await expect(
+    page.locator(".site-header nav a[aria-current='page']"),
+  ).toHaveText("Infrastructure Developers");
+  await page.goto("/#income");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBeTruthy();
+  await expect(page.locator(".income-categories")).toHaveCSS(
+    "grid-template-columns",
+    /^[\d.]+px$/,
+  );
+  await expect(page.locator(".income-audiences")).toHaveCSS(
+    "grid-template-columns",
+    /^[\d.]+px$/,
+  );
+  await page.screenshot({
+    path: "test-results/income-mobile.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.screenshot({
+    path: "test-results/income-desktop.png",
+    fullPage: true,
+  });
+});

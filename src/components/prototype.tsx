@@ -3,13 +3,14 @@ import { useEffect } from "react";
 import { useRoute } from "@/lib/demo-store";
 import { services, type ServiceKey } from "@/lib/demo";
 import { Explore } from "./explore";
+import { EasementIncome } from "./income";
 import { Services, Product } from "./services";
 import { Owner } from "./owner";
 import { Account, Developer } from "./developer";
 import { ReviewForm, Checkout, Submitted, Report } from "./reviews";
 const nav = [
   ["explore", "Explore"],
-  ["services", "Easement Income"],
+  ["income", "Easement Income"],
   ["owner/overview", "Property Owners"],
   ["developer", "Infrastructure Developers"],
 ];
@@ -28,6 +29,9 @@ export function Prototype() {
       break;
     case "map":
       content = <Explore />;
+      break;
+    case "income":
+      content = <EasementIncome />;
       break;
     case "services":
       content = <Services />;
@@ -102,8 +106,9 @@ export function Prototype() {
             const active =
               screen === to.split("/")[0] ||
               (to === "explore" && screen === "map") ||
-              (to === "services" &&
+              (to === "income" &&
                 [
+                  "services",
                   "product",
                   "review",
                   "checkout",

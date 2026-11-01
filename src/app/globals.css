@@ -1284,3 +1284,73 @@ blockquote {
     animation: none;
   }
 }
+
+/* Easement Income explains the market before inviting participation. */
+.income-page {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.income-intro,
+.income-reading {
+  max-width: 800px;
+}
+.income-intro h1 {
+  font-size: clamp(32px, 4vw, 46px);
+}
+.income-lead {
+  font-size: 20px;
+  line-height: 1.6;
+}
+.income-section {
+  margin-top: 52px;
+}
+.income-categories {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+.income-categories .card {
+  margin: 0;
+}
+.income-categories p {
+  margin-bottom: 0;
+}
+.income-audiences {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.income-audiences .card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.income-audiences .button {
+  margin-top: auto;
+}
+.income-closing {
+  border-top: 1px solid var(--line);
+  margin: 48px 0 0;
+  padding-top: 28px;
+  font-size: 20px;
+}
+@media (max-width: 850px) {
+  .income-categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .income-page {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+  .income-audiences,
+  .income-categories {
+    grid-template-columns: 1fr;
+  }
+  .income-section {
+    margin-top: 36px;
+  }
+}
