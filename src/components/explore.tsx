@@ -1,16 +1,52 @@
 "use client";
 import { useState } from "react";
 import { useDemo } from "@/lib/demo-store";
-import { Heading, LinkButton } from "./ui";
-export function Explore({ map = false }: { map?: boolean }) {
+import {
+  generatePrototypeScores,
+  type FeasibilityScore,
+} from "@/lib/feasibility";
+import { LinkButton } from "./ui";
+
+function FeasibilityDial({ category, percentage }: FeasibilityScore) {
+  // HSL hue interpolates continuously from red through yellow to green.
+  const color = `hsl(${percentage * 1.2}, 72%, 42%)`;
+  return (
+    <article className="feasibility-card">
+      <div
+        className="feasibility-dial"
+        role="meter"
+        aria-label={category}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percentage}
+      >
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle className="dial-track" cx="60" cy="60" r="50" />
+          <circle
+            cx="60"
+            cy="60"
+            r="50"
+            pathLength="100"
+            stroke={color}
+            strokeDasharray={`${percentage} 100`}
+          />
+        </svg>
+        <strong aria-hidden="true">{percentage}%</strong>
+      </div>
+      <h2>{category}</h2>
+    </article>
+  );
+}
+
+export function Explore() {
   const [state, set] = useDemo();
   const [address, setAddress] = useState(
     state.address === "123 Main Street" ? "" : state.address,
   );
-  const [layers, setLayers] = useState([true, true, true]);
-  if (!map)
-    return (
-      <section className="landing">
+  const result = state.feasibilityPreview;
+  return (
+    <>
+      <section className={result ? "page explore-search" : "landing"}>
         <p className="eyebrow">Your property. A clearer picture.</p>
         <h1>
           What’s possible
@@ -18,15 +54,25 @@ export function Explore({ map = false }: { map?: boolean }) {
           at your property?
         </h1>
         <p className="muted">
-          Enter an address to explore nearby wireless infrastructure and
-          available property services.
+          Enter an address to receive our Easement Marketing Feasibility
+          Analysis.
         </p>
         <form
           className="address-search"
           onSubmit={(e) => {
             e.preventDefault();
-            set((s) => ({ ...s, address: address.trim() }));
-            location.hash = "map";
+            const submittedAddress = address.trim();
+            if (!submittedAddress) return;
+            const scores = generatePrototypeScores();
+            set((s) => ({
+              ...s,
+              address: submittedAddress,
+              feasibilityPreview: {
+                address: submittedAddress,
+                scores,
+                submission: (s.feasibilityPreview?.submission ?? 0) + 1,
+              },
+            }));
           }}
         >
           <label className="sr-only" htmlFor="address">
@@ -39,112 +85,62 @@ export function Explore({ map = false }: { map?: boolean }) {
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Enter your property address"
           />
-          <button>Explore property →</button>
+          <button type="submit">Explore Property</button>
         </form>
-        <a
-          href="#map"
-          onClick={() =>
-            set((s) => ({ ...s, address: "9 Summer St, Franklin, MA" }))
-          }
-        >
-          Try a sample property
-        </a>
-        <div className="steps">
-          <span>01　Find your property</span>
-          <span>02　Explore the area</span>
-          <span>03　Choose a product</span>
-        </div>
-        <p className="fine">Interactive concept · illustrative content only</p>
-      </section>
-    );
-  return (
-    <>
-      <div className="property-bar">
-        <div>
-          <p className="eyebrow">Your property</p>
-          <strong>{state.address}</strong>
-          <p className="fine">
-            Sample map for interface preview · not a geocoded result
-          </p>
-        </div>
-        <LinkButton to="explore" secondary>
-          Change address
-        </LinkButton>
-      </div>
-      <div className="map-layout">
-        <aside>
-          <Heading eyebrow="Products" title="What’s your goal?" />
-          <LinkButton to="product/relocation" secondary>
-            Relocation Analysis
-            <br />
-            <small>Existing Wireless Sites Only · $499 →</small>
-          </LinkButton>
-          <LinkButton to="product/scip" secondary>
-            SCIP Marketing
-            <br />
-            <small>Recurring property marketing · from $499/year →</small>
-          </LinkButton>
-          <hr />
-          <p className="eyebrow">Map layers</p>
-          {[
-            "FCC Database",
-            "Proprietary Cell Site Structures",
-            "Deadzone Complaints",
-          ].map((l, i) => (
-            <label className="check" key={l}>
-              <input
-                type="checkbox"
-                checked={layers[i]}
-                onChange={() =>
-                  setLayers((v) => v.map((x, j) => (j === i ? !x : x)))
-                }
-              />
-              <span className={"legend layer-" + i}>●</span>
-              {l}
-            </label>
-          ))}
-          <p className="fine">
-            Explore these sample layers with either product.
-          </p>
-        </aside>
-        <div
-          className="map-canvas"
-          role="region"
-          aria-label="Illustrative property map with toggleable sample infrastructure markers"
-        >
-          {layers.map(
-            (on, i) =>
-              on &&
-              [0, 1].map((n) => (
-                <span
-                  key={i + "-" + n}
-                  className={"map-marker layer-" + i}
-                  style={{
-                    left: `${18 + i * 21 + n * 13}%`,
-                    top: `${20 + n * 27 + i * 6}%`,
-                  }}
-                >
-                  {i === 0 ? "●" : i === 1 ? "◆" : "▲"}
-                </span>
-              )),
-          )}
-          <span className="map-note">
-            Map placeholder · sample markers only
-          </span>
-          <span className="map-property">⌖ Your property</span>
-          <div className="map-card">
-            <p className="eyebrow">Property explorer</p>
-            <h3>Lease Checkup</h3>
+        {!result && (
+          <>
+            <div className="steps">
+              <span>01　Find your property</span>
+              <span>02　Preview tenant interest</span>
+              <span>03　Explore marketing services</span>
+            </div>
             <p className="fine">
-              Explore the layers, or visit Services &amp; Pricing for
-              expert-reviewed site assessments.
+              Complimentary feasibility preview · no registration required
             </p>
-            <LinkButton to="services" secondary>
-              Explore services →
+          </>
+        )}
+      </section>
+      {result && (
+        <section
+          className="page feasibility-results"
+          aria-label="Feasibility preview"
+        >
+          <div aria-live="polite" aria-atomic="true">
+            <p className="eyebrow">Your property</p>
+            <h2 className="submitted-address">{result.address}</h2>
+            <p>
+              These scores indicate your property’s potential to attract
+              interest from infrastructure tenants.
+            </p>
+            <div className="feasibility-grid" key={result.submission}>
+              {result.scores.map((score) => (
+                <FeasibilityDial key={score.category} {...score} />
+              ))}
+            </div>
+          </div>
+          <p className="feasibility-scale">
+            0% · Low interest <span>50% · Moderate interest</span> 100% · High
+            interest
+          </p>
+          <p className="fine prototype-score-notice">
+            Prototype preview: these scores are randomly generated for
+            demonstration purposes.
+          </p>
+          <div className="feasibility-cta">
+            <a
+              className="button secondary"
+              href="#account/owner/save"
+              onClick={() => set((s) => ({ ...s, pendingAnalysis: result }))}
+            >
+              Save Complimentary Easement Marketing Feasibility Analysis
+            </a>
+            <LinkButton to="owner/pricing">
+              Subscribe to get the full report and begin marketing your property
+              to infrastructure developers with Easement Exchange!
             </LinkButton>
           </div>
-        </div>
-      </div>
+        </section>
+      )}
     </>
   );
 }

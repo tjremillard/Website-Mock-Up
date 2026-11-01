@@ -1,16 +1,21 @@
 "use client";
 import { useEffect } from "react";
 import { useRoute } from "@/lib/demo-store";
+import { customerAppLinks } from "@/lib/customer-app";
 import { services, type ServiceKey } from "@/lib/demo";
 import { Explore } from "./explore";
+import { EasementIncome } from "./income";
 import { Services, Product } from "./services";
 import { Owner } from "./owner";
-import { Account, Developer } from "./developer";
+import { Developer } from "./developer";
+import { Account } from "./account";
+import { PropertyOwners, OwnerAnalyses } from "./property-owners";
+import { developerTypes, type DeveloperType } from "@/lib/developer-catalog";
 import { ReviewForm, Checkout, Submitted, Report } from "./reviews";
 const nav = [
   ["explore", "Explore"],
-  ["owner/overview", "Owner Portal"],
-  ["services", "Services & Pricing"],
+  ["income", "Easement Income"],
+  ["owner/overview", "Property Owners"],
   ["developer", "Infrastructure Developers"],
 ];
 export function Prototype() {
@@ -18,7 +23,11 @@ export function Prototype() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [route]);
-  const [screen, arg] = route.split("/");
+  const [screen, arg, context, propertyId] = route.split("/");
+  const selectedType =
+    arg && Object.hasOwn(developerTypes, arg)
+      ? (arg as DeveloperType)
+      : undefined;
   const service =
     arg && Object.hasOwn(services, arg) ? (arg as ServiceKey) : undefined;
   let content;
@@ -27,7 +36,10 @@ export function Prototype() {
       content = <Explore />;
       break;
     case "map":
-      content = <Explore map />;
+      content = <Explore />;
+      break;
+    case "income":
+      content = <EasementIncome />;
       break;
     case "services":
       content = <Services />;
@@ -48,6 +60,14 @@ export function Prototype() {
       content = <Report id={arg} />;
       break;
     case "owner":
+      if (!arg || arg === "overview" || arg === "pricing") {
+        content = <PropertyOwners />;
+        break;
+      }
+      if (arg === "analyses") {
+        content = <OwnerAnalyses />;
+        break;
+      }
       content = (
         <Owner
           tab={
@@ -59,10 +79,28 @@ export function Prototype() {
       );
       break;
     case "developer":
-      content = <Developer tab={arg === "pending" ? "pending" : "featured"} />;
+      content = (
+        <Developer
+          key={route}
+          tab={arg === "pending" ? "pending" : "featured"}
+          type={selectedType}
+          propertyId={context}
+        />
+      );
       break;
     case "account":
-      content = <Account />;
+      content = (
+        <Account
+          key={route}
+          audience={arg === "owner" ? "owner" : "developer"}
+          context={context}
+          returnTo={
+            context && Object.hasOwn(developerTypes, context) && propertyId
+              ? `developer/${context}/${propertyId}`
+              : "developer"
+          }
+        />
+      );
       break;
   }
   return (
@@ -91,8 +129,12 @@ export function Prototype() {
             const active =
               screen === to.split("/")[0] ||
               (to === "explore" && screen === "map") ||
-              (to === "services" &&
+              (screen === "account" &&
+                to.split("/")[0] ===
+                  (arg === "owner" ? "owner" : "developer")) ||
+              (to === "income" &&
                 [
+                  "services",
                   "product",
                   "review",
                   "checkout",
@@ -111,6 +153,14 @@ export function Prototype() {
             );
           })}
         </nav>
+        <div className="header-account-actions" aria-label="Customer account">
+          <a className="button secondary" href={customerAppLinks.login}>
+            Log In
+          </a>
+          <a className="button" href={customerAppLinks.signup}>
+            Create Free Account
+          </a>
+        </div>
       </header>
       <div className="concept-banner">
         INTERACTIVE CONCEPT{" "}

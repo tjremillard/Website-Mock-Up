@@ -1168,3 +1168,544 @@ blockquote {
     transition: none !important;
   }
 }
+
+/* Version 2: complimentary Explore feasibility preview. */
+.explore-search .address-search {
+  display: flex;
+  gap: 8px;
+  max-width: 660px;
+  margin: 28px 0 0;
+}
+.feasibility-results {
+  padding-top: 0;
+}
+.submitted-address {
+  overflow-wrap: anywhere;
+}
+.feasibility-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin: 28px 0;
+}
+.feasibility-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+  animation: feasibility-enter 600ms ease-out both;
+}
+.feasibility-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+.feasibility-card:nth-child(3) {
+  animation-delay: 160ms;
+}
+.feasibility-card:nth-child(4) {
+  animation-delay: 240ms;
+}
+.feasibility-card h2 {
+  font-size: 17px;
+  letter-spacing: 0;
+  margin: 18px 0 0;
+}
+.feasibility-dial {
+  position: relative;
+  max-width: 190px;
+  margin: auto;
+}
+.feasibility-dial svg {
+  display: block;
+  width: 100%;
+  transform: rotate(-90deg);
+}
+.feasibility-dial circle {
+  fill: none;
+  stroke-width: 9;
+}
+.feasibility-dial .dial-track {
+  stroke: #edf1e9;
+}
+.feasibility-dial strong {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+}
+.feasibility-scale {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.feasibility-scale::before {
+  content: "";
+  width: 100%;
+  height: 8px;
+  border-radius: 8px;
+  background: linear-gradient(
+    to right,
+    hsl(0, 72%, 42%),
+    hsl(60, 72%, 42%),
+    hsl(120, 72%, 42%)
+  );
+}
+.prototype-score-notice {
+  color: var(--ink);
+}
+.feasibility-cta {
+  margin: 28px 0;
+  text-align: center;
+}
+@keyframes feasibility-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 850px) {
+  .feasibility-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .feasibility-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feasibility-card {
+    animation: none;
+  }
+}
+
+/* Easement Income explains the market before inviting participation. */
+.income-page {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.income-intro,
+.income-reading {
+  max-width: 800px;
+}
+.income-intro h1 {
+  font-size: clamp(32px, 4vw, 46px);
+}
+.income-lead {
+  font-size: 20px;
+  line-height: 1.6;
+}
+.income-section {
+  margin-top: 52px;
+}
+.income-categories {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+.income-categories .card {
+  margin: 0;
+}
+.income-categories p {
+  margin-bottom: 0;
+}
+.income-audiences {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.income-audiences .card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.income-audiences .button {
+  margin-top: auto;
+}
+.income-closing {
+  border-top: 1px solid var(--line);
+  margin: 48px 0 0;
+  padding-top: 28px;
+  font-size: 20px;
+}
+@media (max-width: 850px) {
+  .income-categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .income-page {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+  .income-audiences,
+  .income-categories {
+    grid-template-columns: 1fr;
+  }
+  .income-section {
+    margin-top: 36px;
+  }
+}
+
+/* CRE developer workspace. */
+.developer-page {
+  max-width: 1500px;
+}
+.developer-header {
+  align-items: flex-start;
+}
+.developer-type-control {
+  width: 310px;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.developer-type-control label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.developer-type-control select {
+  margin-top: 6px;
+}
+.developer-type-control .button {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.developer-access {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  padding: 14px 18px;
+  margin: 18px 0;
+}
+.developer-access summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.developer-access .access-plans {
+  margin-top: 20px;
+}
+.developer-listings {
+  min-width: 0;
+}
+.developer-map-section {
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.developer-map-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 18px;
+}
+.developer-map-heading h2 {
+  font-size: 18px;
+  margin: 0;
+}
+.developer-map-heading p {
+  margin: 0 0 4px;
+}
+.developer-map-canvas {
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+.developer-map-canvas > svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.sample-map-label {
+  position: absolute;
+  top: 10px;
+  left: 18px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #657971;
+}
+.infrastructure-marker {
+  position: absolute;
+  font-size: 21px;
+  text-shadow: 0 1px 2px white;
+}
+.infrastructure-marker-0 {
+  color: #705db1;
+}
+.infrastructure-marker-1 {
+  color: #b36b24;
+}
+.infrastructure-marker-2 {
+  color: #aa4e66;
+}
+.developer-property-pin {
+  position: absolute;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px #203d3933;
+  font-size: 12px;
+}
+.developer-property-pin.selected {
+  outline: 3px solid #b38335;
+}
+.developer-map-layers {
+  padding: 14px 18px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.developer-map-layers legend {
+  padding-top: 14px;
+  font-weight: 600;
+}
+.developer-map-layers label {
+  margin: 0;
+  font-size: 12px;
+}
+.developer-map-section > .fine {
+  padding: 12px 18px;
+  margin: 0;
+}
+.infrastructure-key {
+  font-size: 16px;
+}
+.commercial-building {
+  height: 180px;
+  overflow: hidden;
+  background: #dce9ec;
+}
+.commercial-building svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.property-card.horizontal .commercial-building {
+  height: 100%;
+  min-height: 200px;
+}
+.property-address {
+  margin-bottom: 4px;
+}
+.developer-page .catalog {
+  grid-template-columns: 230px minmax(0, 1fr);
+}
+.developer-page .property-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1150px) {
+  .developer-page .property-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 850px) {
+  .developer-page .catalog {
+    grid-template-columns: 1fr;
+  }
+  .developer-header {
+    flex-wrap: wrap;
+  }
+  .developer-type-control {
+    width: 100%;
+  }
+  .developer-page .criteria {
+    margin-bottom: 0;
+  }
+}
+@media (max-width: 600px) {
+  .developer-page .property-grid {
+    grid-template-columns: 1fr;
+  }
+  .developer-map-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .developer-map-canvas {
+    height: 240px;
+  }
+  .developer-page .property-card.horizontal .commercial-building {
+    height: 180px;
+  }
+}
+
+/* Owner marketing services and free account entry. */
+.feasibility-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.owner-services-page {
+  padding-top: 52px;
+  padding-bottom: 52px;
+}
+.owner-services-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+.owner-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+.owner-plan-grid .card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.owner-plan-grid .button {
+  margin-top: auto;
+  width: 100%;
+}
+.owner-plan-price {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.owner-plan-price span {
+  font-size: 14px;
+  font-weight: 400;
+}
+.recommended-plan {
+  border: 2px solid var(--green);
+}
+.recommended-plan .badge {
+  background: var(--green);
+  color: white;
+  margin-bottom: 12px;
+}
+.account-page {
+  max-width: 760px;
+}
+.account-modes {
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.account-modes [aria-pressed="true"] {
+  background: var(--green);
+  color: white;
+}
+.saved-score-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+.saved-score-grid dt {
+  font-size: 12px;
+}
+.saved-score-grid dd {
+  margin: 8px 0 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+.saved-analysis h3 {
+  overflow-wrap: anywhere;
+}
+.property-card-open {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  height: 100%;
+}
+.property-card-open:hover {
+  text-decoration: none !important;
+}
+.property-card-open:hover .button {
+  background: var(--wash);
+}
+.property-card.horizontal {
+  display: block;
+}
+.property-card.horizontal .property-card-open {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+}
+.property-detail > .commercial-building {
+  max-width: 600px;
+  height: 240px;
+  margin: 20px 0;
+}
+@media (max-width: 1000px) {
+  .owner-plan-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .owner-plan-grid,
+  .saved-score-grid {
+    grid-template-columns: 1fr;
+  }
+  .property-card.horizontal .property-card-open {
+    display: block;
+  }
+}
+
+/* Shared marketing-site account entry points lead to the separate customer app. */
+.site-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+}
+.header-account-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.header-account-actions .button {
+  font-size: 12px;
+  padding: 10px 12px;
+  white-space: nowrap;
+}
+@media (max-width: 1150px) {
+  .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .site-header nav {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+  .header-account-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+@media (max-width: 600px) {
+  .site-header {
+    gap: 12px 8px;
+  }
+  .site-header .brand small {
+    max-width: 70px;
+    font-size: 7px;
+  }
+  .header-account-actions {
+    gap: 5px;
+  }
+  .header-account-actions .button {
+    font-size: 10px;
+    padding: 8px 7px;
+  }
+}
+@media (max-width: 380px) {
+  .site-header .brand small {
+    display: none;
+  }
+}
