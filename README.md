@@ -1,3 +1,20 @@
+# Alternative Infrastructure Realty (AIR)
+
+AIR launch marketing and Massachusetts Wireless Explore, plus protected national vision prototypes, in the existing Next.js 16 App Router repository. Work is isolated on `feature/air-redesign`.
+
+```bash
+npm ci
+npm run dev
+```
+
+Open `/` for launch marketing and `/app` for Explore. `/vision` and all descendants remain locked unless server-only preview secrets are configured. `/legacy` retains the previous Easement fragment-routed prototype; `/starter` retains the original residential starter. No paid services, production auth, live map data or payment integrations are connected.
+
+See [the current handoff](docs/DEVELOPER-HANDOFF.md) for route details, secure local vision setup, QA commands and the prioritized production backlog. See [the supplied specification](docs/AIR_IMPLEMENTATION_SPEC.md) for the product brief. All AIR property, infrastructure and editorial fixtures are explicitly synthetic.
+
+---
+
+## Historical project README
+
 # Website Mock-Up
 
 This repository is for prototyping the Easement Real Estate website using Codex.

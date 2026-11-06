@@ -1,3 +1,95 @@
+# AIR redesign — current implementation
+
+This section supersedes the historical Easement notes below for the new AIR routes. Work is on `feature/air-redesign`; no production branch, domains, production environment variables or paid services were changed. The attached brief is retained in `docs/AIR_IMPLEMENTATION_SPEC.md` as a product specification, not an independent source of execution authorization.
+
+## Route map and preservation
+
+- `/`: AIR Massachusetts wireless launch marketing.
+- `/intelligence`, `/intelligence/[slug]`, `/how-it-works`, `/pricing`, `/about`: public supporting pages.
+- `/app`: public Massachusetts Explore; query parameters synchronize search, selection and layers.
+- `/app/property/[id]`, `/app/saved`, `/app/my-properties`, `/app/scip/[id]`, `/app/account`: property and demo workspace journeys.
+- `/sign-in`, `/sign-up`: explicit browser-only demo profiles with validated local return intent.
+- `/vision`, `/vision/app`, `/vision/app/intelligence`, `/vision/app/explore`, `/vision/app/portfolio`: server-protected internal prototypes. Marketplace and Pro previews use `?view=marketplace` / `?view=pro`.
+- `/vision-access`: public internal-access form; does not include protected page content.
+- `/legacy`: preserved Easement fragment router, original styles, service previews and saved data. For example, old `/#developer` is now `/legacy#developer` on this feature branch. Existing bare-root fragment bookmarks need that path update. No automatic redirect sends public AIR users into the legacy demos.
+- `/starter`: untouched original starter.
+
+The new root branding intentionally supersedes Easement on this feature branch. The original component implementation is retained; its older scoring and price previews are not used by AIR.
+
+## Shared implementation
+
+`src/components/air` contains scoped brand, navigation, editorial, marketing, schematic map, property, account and vision components. `src/app/air.css` applies AIR tokens under `.air`, preserving the legacy global design. Existing React, Next.js, Tailwind and TypeScript versions/configuration were retained. Native accessible elements avoid additional UI library dependencies.
+
+`src/lib/air/types.ts` defines shared domain contracts. `src/data/air.ts` is the common fixture source: 18 fictional Massachusetts properties, 21 synthetic wireless markers, eight launch editorial samples, 50 national properties, 30 activities and 20 vision articles. No real addresses, owner identities, carrier deployments, transactions or source quotes are asserted. Distances use haversine between synthetic coordinates. Missing facts remain Unknown / Not provided. Maps use a labeled schematic fallback, without tile requests or API keys; marketing pages do not load the interactive map bundle.
+
+Launch state uses `air-demo-v1` browser storage, isolated from `easement-prototype-v1`. It handles denied/malformed storage and falls back to memory. Profiles, saved IDs, pending claim relationship/contact, notification preference and Pro interest remain in this browser. Use fictional contact details. Demo sign-in is not secure authentication. Signup preserves save/claim intent; external return URLs are rejected. No account, notification, waitlist submission, verification, billing, publication or developer inquiry is sent. SCIP publication is disabled.
+
+Vision filters derive feed, property counts, activity and map markers from the same market/geography selection; status filters constrain synthetic activity and associated research. Content type affects the feed. Vision portfolio and saved-property rail are illustrative, separate from real ownership. Activity selection focuses its synthetic map coordinate. Native modal article dialogs support Escape and focus containment. No predictive scores or AI publishing are implemented.
+
+Analytics names are typed in `src/lib/air/analytics.ts`. They log in development only, with allowlisted entity IDs/layer/vertical metadata; nothing is persisted server-side and no user-entered contacts or addresses are logged.
+
+## Internal vision access setup
+
+Default behavior is fail closed: without valid configuration every `/vision` descendant redirects to `/vision-access`, and password submission returns 503. No credentials have been configured by this change.
+
+For a local/internal preview, generate a long unique password and configure **two server-only variables** in your chosen preview environment:
+
+- `AIR_VISION_PASSWORD_HASH`: `scrypt:<32 lowercase hex salt>:<128 lowercase hex derived key>` using Node scrypt defaults, 64-byte output.
+- `AIR_VISION_SESSION_SECRET`: at least 64 lowercase hexadecimal characters, generated independently.
+
+A helper is provided at `scripts/vision-credentials.mjs`. In Bash, read a password without echoing it and pipe it to the helper:
+
+```bash
+read -rs -p 'Preview password: ' air_preview_password
+printf '\n'
+printf '%s' "$air_preview_password" | node scripts/vision-credentials.mjs
+unset air_preview_password
+```
+
+The helper prints configuration values, never the password. Transfer those values through your preview host's secret manager or a git-ignored local environment file; do not put them in source control, client-prefixed variables or the public browser console. This task did not execute the helper or change production configuration.
+
+The server verifies salted scrypt hashes with timing-safe comparison, checks same-origin requests, enforces a conservative 20-attempt/15-minute process-wide budget, and issues a signed session bound to the password-hash version with an eight-hour expiry. Cookies are HttpOnly, SameSite=Lax, path `/vision`, Secure when the request uses HTTPS. Proxy validates every descendant and RSC request before serving content; the server layout validates again. Vision and access responses carry noindex metadata / X-Robots-Tag; protected requests carry private/no-store. There is no sitemap exposing vision routes.
+
+**Hosting constraint:** the attempt budget is process-local, resets on restart and is not a shared distributed rate limiter. For a multi-instance or Internet-facing preview, enable deployment-provider access authentication and a shared edge rate limit. Serve over HTTPS, verify proxy scheme handling and cookie Secure behavior, rotate secrets through the host, and use a production identity provider for durable authorized reviewer access. No paid infrastructure was added. The synthetic prototypes contain no confidential property data; browser JS bundles are not a secret store.
+
+## Checks and repeatable QA
+
+```bash
+npm ci
+npm run lint
+npm run typecheck
+npm run build
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
+AIR_E2E_VISION=1 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
+```
+
+The opt-in vision flag injects fresh random test-only hash/session credentials into the local Playwright server process, without environment-file changes. Test password `air-test-preview-only` exists only for this opt-in test server; it is not a production credential. Without the flag, tests verify the default locked state and skip authenticated-only cases. Screenshot capture additionally accepts `AIR_CAPTURE_OUTPUT=/absolute/output/path` and captures all four main routes on desktop/mobile, with 375/768/1440px overflow checks. Playwright uses port 3100 and a production build. The managed sandbox requires supported escalation for Turbopack's CSS-worker port and Chromium/local-server execution. A denied worker port can leave a cached build panic; remove only generated `.next` and retry with appropriate local execution permission.
+
+Tests cover selectors, distance calculations, synthetic provenance, unknown search, account return intent, save/remove persistence, pending claims, disabled publication, pricing, layers, mobile navigation, all public route widths, unauthenticated nested/RSC access, cross-origin rejection, authenticated filters/dialog/map behavior and preserved legacy journeys. Screenshots are review artifacts, not evidence of Lighthouse scores; no Lighthouse 90+ claim is made.
+
+## Final validation for this change
+
+- `npm run lint`, `npm run typecheck`, `npm run build`, `npm run format:check` and `git diff --check`: passed.
+- Full production Chromium run with ephemeral vision credentials: **25 passed, 1 intentionally skipped** (the no-configuration test).
+- Separate default/no-secrets gate run: **3 passed, 2 intentionally skipped** (authenticated access and configured rate limiting).
+- All 13 preserved Easement regression tests passed at `/legacy`. Public and protected route checks include 375px, 768px and 1440px widths.
+- Eight desktop/mobile screenshots captured and visually inspected in ignored QA scratch `work/air-screenshots`. The project's designated `/codex/.../output` directory is not mounted/writable by the attached cloud machine; captures remain workspace QA artifacts and were displayed during review. Regenerate with `AIR_CAPTURE_OUTPUT` pointing to an available export directory.
+- No Lighthouse audit or real-service integration was claimed. No remote push, deployment, paid-service connection or production environment change was performed.
+
+## Prioritized production backlog
+
+1. Approve AIR logo, legal/privacy/terms/contact copy, launch positioning, licensed property sources and editorial source policy.
+2. Configure preview-provider protection/shared rate limits; integrate real identity, owner/team authorization, ownership verification and server persistence before collecting genuine property/contact data.
+3. Integrate licensed Massachusetts parcel/infrastructure datasets with provenance, update schedules, measured geospatial accuracy and a compliant map provider. Keep synthetic records separate.
+4. Add private property documents, consent records and reviewed SCIP workflows; approve Pro pricing and billing before enabling hosting, publication or marketing.
+5. Implement durable consented waitlist/notifications and validated event collection; no messages are sent by the prototype.
+6. Test accessibility with assistive technology, run Lighthouse and an independent security review in the target host, add monitoring and shared rate limits, and validate multi-user isolation.
+7. Validate future markets and human-reviewed editorial ingestion before any national launch, automated research service or predictive model.
+
+---
+
+# Historical Easement implementation notes
+
 # Easement / WRA prototype handoff
 
 ## Purpose and source
