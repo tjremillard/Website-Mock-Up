@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./air.css";
 export const metadata: Metadata = {
-  title: "Easement | Real Estate",
+  title: "AIR | Alternative Infrastructure Realty",
   description:
-    "Explore property infrastructure opportunities, manage leases, and review property services. Easement Real Estate / WRA prototype.",
+    "Explore Massachusetts wireless infrastructure and property intelligence with Alternative Infrastructure Realty.",
 };
 export default function RootLayout({
   children,

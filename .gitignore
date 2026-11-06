@@ -43,3 +43,6 @@ next-env.d.ts
 # browser test outputs
 /playwright-report/
 /test-results/
+
+# local implementation scratch
+/work/

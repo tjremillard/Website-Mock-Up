@@ -1,4 +1,4 @@
 import { Prototype } from "@/components/prototype";
-export default function Home() {
+export default function Legacy() {
   return <Prototype />;
 }

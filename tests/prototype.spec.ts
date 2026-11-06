@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 test("Explore feasibility preview, stable scores, resubmission and pricing", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/legacy");
   await expect(page.locator(".site-header nav a")).toHaveText([
     "Explore",
     "Easement Income",
@@ -117,7 +117,7 @@ test("lease review checkout, manual stages, report and persistence", async ({
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/#services");
+  await page.goto("/legacy#services");
   await page.getByRole("link", { name: "Start my Lease Checkup" }).click();
   await expect(
     page.getByRole("heading", { name: "Start your Lease Checkup" }),
@@ -166,7 +166,7 @@ test("lease review checkout, manual stages, report and persistence", async ({
 test("owner opportunities, saved interest, and additional documents", async ({
   page,
 }) => {
-  await page.goto("/#owner/workspace");
+  await page.goto("/legacy#owner/workspace");
   await expect(page.getByText("T-Mobile escalation coming up")).toBeVisible();
   await page
     .getByRole("button", { name: "Learn more about Community Solar" })
@@ -194,7 +194,7 @@ test("owner opportunities, saved interest, and additional documents", async ({
 test("developer property gate, free account, and pending inquiry", async ({
   page,
 }) => {
-  await page.goto("/#developer");
+  await page.goto("/legacy#developer");
   await expect(page.locator(".property-card")).toHaveCount(5);
   await expect(page.getByText("Catalog access", { exact: false })).toHaveCount(
     0,
@@ -232,7 +232,7 @@ test("developer property gate, free account, and pending inquiry", async ({
   await page
     .getByRole("button", { name: "Request introduction · demo" })
     .click();
-  await page.goto("/#developer/pending");
+  await page.goto("/legacy#developer/pending");
   await expect(
     page.getByText("We are exploring rooftop infrastructure."),
   ).toBeVisible();
@@ -244,7 +244,7 @@ test("developer property gate, free account, and pending inquiry", async ({
 test("developer login returns to chosen property and direct links stay gated", async ({
   page,
 }) => {
-  await page.goto("/#developer/battery/battery-office");
+  await page.goto("/legacy#developer/battery/battery-office");
   await expect(
     page.getByRole("heading", { name: "Create a Free Account", exact: true }),
   ).toBeVisible();
@@ -264,7 +264,7 @@ test("developer login returns to chosen property and direct links stay gated", a
       JSON.stringify({ ...state, developerSignedIn: false }),
     );
   });
-  await page.goto("/#developer/battery");
+  await page.goto("/legacy#developer/battery");
   await page
     .getByRole("button", { name: "View 210 River Street on map", exact: true })
     .click();
@@ -292,7 +292,7 @@ test("developer login returns to chosen property and direct links stay gated", a
 test("SCIP billing and saved review draft retain selected plan", async ({
   page,
 }) => {
-  await page.goto("/#product/scip");
+  await page.goto("/legacy#product/scip");
   await page.getByRole("radio").nth(1).check();
   await page.getByRole("link", { name: "Continue · $49/month" }).click();
   await page.getByRole("button", { name: "Save and return" }).click();
@@ -321,7 +321,7 @@ test("mobile screens fit and original starter remains accessible", async ({
     "product/relocation",
     "product/scip",
   ]) {
-    await page.goto("/#" + route);
+    await page.goto("/legacy#" + route);
     await expect(page.locator("main h1").first()).toBeVisible();
     expect(
       await page.evaluate(
@@ -343,7 +343,7 @@ test("mobile screens fit and original starter remains accessible", async ({
 test("Easement Income explains the market and routes both audiences", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/legacy");
   await page
     .getByRole("link", { name: "Easement Income", exact: true })
     .click();
@@ -390,7 +390,7 @@ test("Easement Income explains the market and routes both audiences", async ({
   await expect(
     page.locator(".site-header nav a[aria-current='page']"),
   ).toHaveText("Infrastructure Developers");
-  await page.goto("/#income");
+  await page.goto("/legacy#income");
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   expect(
@@ -418,7 +418,7 @@ test("Easement Income explains the market and routes both audiences", async ({
 });
 
 test("developer types switch CRE catalogs and map layers", async ({ page }) => {
-  await page.goto("/#developer");
+  await page.goto("/legacy#developer");
   const selector = page.getByLabel("Infrastructure Developer Type", {
     exact: true,
   });
@@ -538,7 +538,7 @@ test("developer types switch CRE catalogs and map layers", async ({ page }) => {
 test("save complimentary preview through free owner signup without changing scores", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/legacy");
   await page
     .getByLabel("Enter your property address")
     .fill("25 Commerce Avenue");
@@ -596,7 +596,7 @@ test("save complimentary preview through free owner signup without changing scor
 test("Property Owners service prices, plan selection, and mobile layout", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/legacy");
   await page
     .getByRole("link", { name: "Property Owners", exact: true })
     .click();
@@ -650,7 +650,7 @@ test("Property Owners service prices, plan selection, and mobile layout", async 
 test("legacy catalog restrictions no longer limit developer listings", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/legacy");
   await page.evaluate(() =>
     localStorage.setItem(
       "easement-prototype-v1",
@@ -660,7 +660,7 @@ test("legacy catalog restrictions no longer limit developer listings", async ({
       }),
     ),
   );
-  await page.goto("/#developer");
+  await page.goto("/legacy#developer");
   await expect(page.locator(".property-card")).toHaveCount(5);
   await expect(page.locator(".developer-access, .criteria")).toHaveCount(0);
 });
@@ -669,7 +669,7 @@ test("marketing tabs share separate app account buttons and streamlined content"
   page,
 }) => {
   for (const route of ["explore", "income", "owner/overview", "developer"]) {
-    await page.goto(`/#${route}`);
+    await page.goto(`/legacy#${route}`);
     const header = page.locator(".site-header");
     const login = header.getByRole("link", { name: "Log In", exact: true });
     const signup = header.getByRole("link", {
@@ -694,7 +694,7 @@ test("marketing tabs share separate app account buttons and streamlined content"
       bounds!.x + bounds!.width - 40,
     );
   }
-  await page.goto("/#owner/overview");
+  await page.goto("/legacy#owner/overview");
   await expect(
     page
       .locator("main")
@@ -706,7 +706,7 @@ test("marketing tabs share separate app account buttons and streamlined content"
       .getByRole("link", { name: "Owner workspace", exact: true }),
   ).toHaveCount(0);
   await expect(page.locator(".owner-plan-grid .card")).toHaveCount(4);
-  await page.goto("/#developer");
+  await page.goto("/legacy#developer");
   await expect(
     page.getByRole("navigation", { name: "Developer workspace" }),
   ).toHaveCount(0);
@@ -734,7 +734,7 @@ test("marketing tabs share separate app account buttons and streamlined content"
   for (const width of [390, 320]) {
     await page.setViewportSize({ width, height: 844 });
     for (const route of ["explore", "income", "owner/overview", "developer"]) {
-      await page.goto(`/#${route}`);
+      await page.goto(`/legacy#${route}`);
       await expect(
         page
           .locator(".header-account-actions")
